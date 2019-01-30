@@ -1,30 +1,34 @@
 {
-    "name": "litipk/flysystem-fallback-adapter",
-    "description": "Flysystem adapter for fallback filesystems",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Andrés Correa Casablanca",
-            "email": "castarco@litipk.com"
-        }
-    ],
-    "support": {
-        "email": "castarco@litipk.com",
-        "issues": "http://github.com/Litipk/flysystem-fallback-adapter/issues",
-        "source": "http://github.com/Litipk/flysystem-fallback-adapter"
+  "name": "maninhat/flysystem-fallback-adapter",
+  "description": "Flysystem adapter for fallback filesystems",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Andrés Correa Casablanca",
+      "email": "castarco@litipk.com"
     },
-    "require": {
-        "php": ">=5.4.0",
-        "league/flysystem": "~1.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "~4.0",
-        "mockery/mockery": "0.9.*"
-    },
-    "autoload": {
-        "psr-4": {
-            "Litipk\\Flysystem\\Fallback\\": "src/"
-        }
-    },
-    "minimum-stability": "stable"
+    {
+      "name": "Mikhail Kulebyakin",
+      "email": "kulebyakin@gmail.com"
+    }
+  ],
+  "support": {
+    "email": "castarco@litipk.com",
+    "issues": "http://github.com/maninhat/flysystem-fallback-adapter/issues",
+    "source": "http://github.com/maninhat/flysystem-fallback-adapter"
+  },
+  "require": {
+    "php": ">=7.2.0",
+    "league/flysystem": "~1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0",
+    "mockery/mockery": "0.9.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Litipk\\Flysystem\\Fallback\\": "src/"
+    }
+  },
+  "minimum-stability": "stable"
 }

@@ -28,7 +28,7 @@ class FallbackAdapter implements AdapterInterface
      *
      * @param AdapterInterface $mainAdapter
      * @param AdapterInterface $fallback
-     * @param boolean          $forceCopyOnMain
+     * @param boolean $forceCopyOnMain
      */
     public function __construct(AdapterInterface $mainAdapter, AdapterInterface $fallback, $forceCopyOnMain = false)
     {
@@ -68,14 +68,6 @@ class FallbackAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function writeStream($path, $resource, Config $config)
-    {
-        return $this->mainAdapter->writeStream($path, $resource, $config);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function update($path, $contents, Config $config)
     {
         // This is done to allow "append" mode in the underlying main adapter
@@ -84,6 +76,29 @@ class FallbackAdapter implements AdapterInterface
         }
 
         return $this->mainAdapter->update($path, $contents, $config);
+    }
+
+    /**
+     * Copies a resource accessible through the fallback adapter to the filesystem abstracted with the main adapter.
+     *
+     * @param $path
+     * @return boolean
+     */
+    private function portFromFallback($path, $newpath)
+    {
+        $buffer = $this->fallback->readStream($path);
+
+        if (false === $buffer) {
+            return false;
+        }
+
+        $result = $this->mainAdapter->writeStream($newpath, $buffer['stream'], new Config());
+
+        if (is_resource($buffer['stream'])) {
+            fclose($buffer['stream']);
+        }
+
+        return (false !== $result);
     }
 
     /**
@@ -131,6 +146,7 @@ class FallbackAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     * @throws FileNotFoundException
      */
     public function delete($path)
     {
@@ -159,6 +175,7 @@ class FallbackAdapter implements AdapterInterface
 
     /**
      * {@inheritdoc}
+     * @throws FileNotFoundException
      */
     public function deleteDir($dirname)
     {
@@ -218,13 +235,17 @@ class FallbackAdapter implements AdapterInterface
      */
     public function read($path)
     {
-        $result = $this->mainAdapter->read($path);
+        if ($this->mainAdapter->has($path)) {
+            $result = $this->mainAdapter->read($path);
 
-        if (false !== $result) {
-            return $result;
+            if (false !== $result) {
+                return $result;
+            }
         }
-
-        $result = $this->fallback->read($path);
+        if($this->fallback->has($path))
+        {
+            $result = $this->fallback->read($path);
+        }
 
         if (false !== $result && $this->forceCopyOnMain) {
             $this->mainAdapter->write($path, $result['contents'], new Config());
@@ -251,6 +272,14 @@ class FallbackAdapter implements AdapterInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function writeStream($path, $resource, Config $config)
+    {
+        return $this->mainAdapter->writeStream($path, $resource, $config);
     }
 
     /**
@@ -333,28 +362,5 @@ class FallbackAdapter implements AdapterInterface
         }
 
         return $this->fallback->getVisibility($path);
-    }
-
-    /**
-     * Copies a resource accessible through the fallback adapter to the filesystem abstracted with the main adapter.
-     *
-     * @param $path
-     * @return boolean
-     */
-    private function portFromFallback($path, $newpath)
-    {
-        $buffer = $this->fallback->readStream($path);
-
-        if (false === $buffer) {
-            return false;
-        }
-
-        $result = $this->mainAdapter->writeStream($newpath, $buffer['stream'], new Config());
-
-        if (is_resource($buffer['stream'])) {
-            fclose($buffer['stream']);
-        }
-
-        return (false !== $result);
     }
 }
