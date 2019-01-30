@@ -242,13 +242,15 @@ class FallbackAdapter implements AdapterInterface
                 return $result;
             }
         }
-        if($this->fallback->has($path))
-        {
+        if ($this->fallback->has($path)) {
             $result = $this->fallback->read($path);
         }
 
         if (false !== $result && $this->forceCopyOnMain) {
-            $this->mainAdapter->write($path, $result['contents'], new Config());
+            $mainAdapterWrite = $this->mainAdapter->write($path, $result['contents'], new Config());
+            if (false !== $mainAdapterWrite) {
+                $this->fallback->delete($path);
+            }
         }
 
         return $result;
@@ -268,7 +270,10 @@ class FallbackAdapter implements AdapterInterface
         $result = $this->fallback->readStream($path);
 
         if (false !== $result && $this->forceCopyOnMain) {
-            $this->writeStream($path, $result['stream'], new Config());
+            $mainAdapterWrite = $this->writeStream($path, $result['stream'], new Config());
+            if (false !== $mainAdapterWrite) {
+                $this->fallback->delete($path);
+            }
         }
 
         return $result;
